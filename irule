@@ -1,11 +1,17 @@
 when HTTP_REQUEST {
     #log local0. "[HTTP::uri]"
     #log local0. "[HTTP::header Host]"
+    if { [HTTP::header exists CF-Auth] and [HTTP::header value CF-Auth] equals "1111" } { } else {  
+        reject
+        event disable all
+        return    
+    }    
     set hdr [string map {\r\n <br>} [HTTP::request]]
     HTTP::header replace Host "xpm9db9xf0.execute-api.us-east-1.amazonaws.com"
     if { [HTTP::uri] starts_with "/test/header" } {
         HTTP::respond 200 content "<html><head><title>Request Rejected</title></head><body>From IP: [IP::client_addr]<br><br>$hdr<br><br>--**--<br><br><a href=\"javascript:history.back();\">Go Back</a></body></html>" Cache-Control "private, no-store, no-cache"
     }
+
 }
 when ASM_REQUEST_BLOCKING {
     #log local0.debug "ASM::status = [ASM::status] **"
